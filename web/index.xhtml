@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <h:head>
+        <title>Catálogo de Cuentas</title>
+    </h:head>
+    <h:body>
+        <h:form>
+
+            <!-- Formulario para agregar cuentas -->
+            <h3>Agregar Nueva Cuenta</h3>
+            <h:panelGrid columns="2" cellpadding="5">
+
+                <h:outputLabel for="codigo" value="Código:" />
+                <p:inputText id="codigo" value="#{cuentaController.codigo}" readonly="true" />
+
+                <h:outputLabel for="clase" value="Clase:" />
+                <p:selectOneMenu id="clase" value="#{cuentaController.clase}" 
+                                 required="true" requiredMessage="Seleccione una clase">
+                    <f:selectItem itemLabel="Seleccione" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{cuentaController.clases}" />
+                    <!-- Llamada AJAX para actualizar la lista de subclases al cambiar la clase -->
+                    <p:ajax update="subclase codigo" listener="#{cuentaController.actualizarSubclases}" />
+                </p:selectOneMenu>
+
+                <h:outputLabel for="subclase" value="Subclase:" />
+                <p:selectOneMenu id="subclase" value="#{cuentaController.subclase}" 
+                                 required="true" requiredMessage="Seleccione una subclase">
+                    <f:selectItem itemLabel="Seleccione" itemValue="" noSelectionOption="true" />
+                    <f:selectItems value="#{cuentaController.subclases}" />
+                </p:selectOneMenu>
+
+                <h:outputLabel for="nombre" value="Nombre:" />
+                <p:inputText id="nombre" value="#{cuentaController.nombre}" required="true"
+                             requiredMessage="Ingrese el nombre de la cuenta" />
+
+                <f:facet name="footer">
+                    <p:commandButton value="Agregar Cuenta" action="#{cuentaController.agregarCuenta}"
+                                     update="tablaCuentas, codigo, subclase, nombre" />
+                </f:facet>
+            </h:panelGrid>
+
+            <!-- Tabla para listar cuentas -->
+            <h3>Lista de Cuentas</h3>
+            <p:dataTable id="tablaCuentas" value="#{cuentaController.cuentas}" var="cuenta" 
+                         sortBy="#{cuenta.codigo}" emptyMessage="No hay cuentas registradas">
+                <p:column headerText="Código" sortBy="#{cuenta.codigo}">
+                    <h:outputText value="#{cuenta.codigo}" />
+                </p:column>
+                <p:column headerText="Clase" sortBy="#{cuenta.clase}">
+                    <h:outputText value="#{cuenta.clase}" />
+                </p:column>
+                <p:column headerText="Subclase" sortBy="#{cuenta.subclase}">
+                    <h:outputText value="#{cuenta.subclase}" />
+                </p:column>
+                <p:column headerText="Nombre" sortBy="#{cuenta.nombre}">
+                    <h:outputText value="#{cuenta.nombre}" />
+                </p:column>
+            </p:dataTable>
+
+            <!-- Botón para abrir la nueva ventana con la lista imprimible -->
+            <p:commandButton value="Imprimir Lista" 
+                             onclick="window.open('faces/CuentasImprimir.xhtml', '_blank'); return false;" 
+                             icon="pi pi-print" />
+
+        </h:form>
+    </h:body>
+</html>

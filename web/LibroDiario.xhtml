@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <h:head>
+        <title>Libro Diario - PrimeFaces</title>
+    </h:head>
+    <h:body>
+        <h:form>
+            <!-- Panel de Entrada de Datos del Asiento -->
+            <p:panel header="Registro de Asiento Contable" style="width: 50%; margin: auto;">
+                <!-- Selección de Fecha -->
+                <p:panelGrid columns="2" style="width: 100%;" columnClasses="label,value">
+                    <h:outputLabel for="fecha" value="Fecha:" />
+                    <p:calendar id="fecha" value="#{libroDiarioController.asientoActual.fecha}" pattern="dd/MM/yyyy" showButtonPanel="true" />
+
+                    <!-- Descripción del Asiento -->
+                    <h:outputLabel for="descripcion" value="Descripción:" />
+                    <p:inputText id="descripcion" value="#{libroDiarioController.asientoActual.descripcion}" style="width:100%;" />
+                </p:panelGrid>
+
+                <!-- Partidas del Asiento -->
+                <p:panelGrid columns="4" style="width: 100%;" columnClasses="label,value,value,value">
+                    <h:outputLabel value="Cuenta:" />
+                    <p:selectOneMenu id="cuenta" value="#{selectedCuenta}" style="width:100%;" converter="CuentaConverter">
+                        <f:selectItem itemLabel="Seleccione una cuenta" itemValue="" noSelectionOption="true" />
+                        <f:selectItems value="#{libroDiarioController.cuentasDisponibles}" var="cuenta"
+                                       itemValue="#{cuenta}" itemLabel="#{cuenta.nombre} (#{cuenta.codigo})" />
+                    </p:selectOneMenu>
+
+
+                    <h:outputLabel value="Monto:" />
+                    <p:inputText id="monto" value="#{partidaMonto}" />
+
+                    <h:outputLabel value="Debe:" />
+                    <p:selectBooleanCheckbox id="debe" value="#{esDebe}" />
+
+                    <!-- Botón para Agregar Partida -->
+                    <p:commandButton value="Agregar Partida" icon="pi pi-plus"
+                                     action="#{libroDiarioController.agregarPartida(selectedCuenta, partidaMonto, esDebe, libroDiarioController.asientoActual.descripcion)}"
+                                     update="@form" style="margin-left: 10px;" />
+                </p:panelGrid>
+
+                <!-- Botón para Registrar Asiento Completo -->
+                <p:commandButton value="Registrar Asiento" icon="pi pi-check" 
+                                 action="#{libroDiarioController.registrarAsiento}" update="@form" style="margin-top:20px;" />
+
+                <!-- Mostrar mensajes de validación -->
+                <p:messages showDetail="true" closable="true" />
+            </p:panel>
+
+            <!-- Tabla para mostrar todas las partidas del asiento actual -->
+            <p:dataTable value="#{libroDiarioController.asientoActual.partidas}" var="partida" style="width: 50%; margin: auto; margin-top:20px;"
+                         paginator="true" rows="5">
+                <p:column headerText="Código de Cuenta">
+                    <h:outputText value="#{partida.cuenta.codigo}" />
+                </p:column>
+                <p:column headerText="Cuenta">
+                    <h:outputText value="#{partida.cuenta.nombre}" />
+                </p:column>
+                <p:column headerText="Debe">
+                    <h:outputText value="#{partida.esDebe ? partida.monto : ''}" />
+                </p:column>
+                <p:column headerText="Haber">
+                    <h:outputText value="#{!partida.esDebe ? partida.monto : ''}" />
+                </p:column>
+            </p:dataTable>
+            <h2> Lista de Asientos contables</h2>
+    <p:dataTable value="#{libroDiarioController.libroDiario}" var="asiento">
+        <p:column headerText="Fecha">
+            <h:outputText value="#{asiento.fecha}" />
+        </p:column>
+        <p:column headerText="Partidas">
+            <!-- Muestra las partidas con el método toString() que acabas de definir -->
+            <h:outputText value="#{asiento.getsPartidas()}" />
+        </p:column>
+        <p:column headerText="Descripcion del Asiento Contable">
+            <h:outputText value="#{asiento.descripcion}" />
+        </p:column>
+    </p:dataTable>
+        </h:form>
+    </h:body>
+</html>
